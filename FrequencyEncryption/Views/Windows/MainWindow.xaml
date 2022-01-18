@@ -6,8 +6,36 @@
         xmlns:local="clr-namespace:FrequencyEncryption"
         xmlns:vm="clr-namespace:FrequencyEncryption.ViewModels"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="730">
+    <Window.DataContext>
+        <vm:MainWindowViewModel/>
+    </Window.DataContext>
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="125"/>
+            <ColumnDefinition Width="300"/>            
+        </Grid.ColumnDefinitions>
+        <TabControl Grid.Column="0" SelectedIndex="{Binding ActiveTab}">
+            <TabItem Header="Вихідний текст">
+                <TextBox Text="{Binding BaseText}"/>
+            </TabItem>
+            <TabItem Header="Зашифрований текст">
+                <TextBox Text="{Binding EncryptedText}"/>
+            </TabItem>
+            <TabItem Header="Test">
+                <ListBox ItemsSource="{Binding TestdDict}"/>
+            </TabItem>
+        </TabControl>             
+
+        <StackPanel Grid.Column="1" Orientation="Vertical" Margin="5">
+            <Button Margin="5 25 5 5" Content="Зашифрувати" Height="25" Command="{Binding EncryptCommand}"/>
+            <Button Margin="5" Content="Розшифрувати" Height="25" Command="{Binding DecipherCommand}"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Vertical" Grid.Column="2">
+            <TextBlock Text="Результат розшифрування:" HorizontalAlignment="Center" Margin="5"/>
+            <TextBox Text="{Binding DecipheredText}" Margin="5 0 5 5"/>
+        </StackPanel>
     </Grid>
 </Window>
