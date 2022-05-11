@@ -14,6 +14,17 @@ namespace FrequencyEncryption.ViewModels
 
         /*------------------------------------------------------------------------------------*/
 
+        #region Title : Title - початковий текст
+        private string _Title = "Точність розшифровки";
+
+        public string Title
+        {
+            get => _Title;
+            set => Set(ref _Title, value);
+        }
+
+        #endregion
+
         #region ActiveTab : ActiveTab - номер вкладки
         private int _ActiveTab = 0;
 
@@ -67,13 +78,23 @@ namespace FrequencyEncryption.ViewModels
         }
         #endregion
 
-        #region TestdDict : TestdDict        
-        private Dictionary<char, char> _TestdDict;
+        #region CipherdDict : CipherDict        
+        private Dictionary<char, char> _CipherDict;
 
-        public Dictionary<char, char> TestdDict
+        public Dictionary<char, char> CipherDict
         {
-            get => _TestdDict;
-            set => Set(ref _TestdDict, value);
+            get => _CipherDict;
+            set => Set(ref _CipherDict, value);
+        }
+        #endregion
+
+        #region DeCipherDict : DeCipherDict        
+        private Dictionary<char, char> _DeCipherDict;
+
+        public Dictionary<char, char> DeCipherDict
+        {
+            get => _DeCipherDict;
+            set => Set(ref _DeCipherDict, value);
         }
         #endregion
 
@@ -84,41 +105,71 @@ namespace FrequencyEncryption.ViewModels
         {
             Dictionary<char, double> dict = new Dictionary<char, double>();
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            FileInfo info = new FileInfo("Частотность.xlsx");
+            //FileInfo info = new FileInfo("Частотность.xlsx");
+            FileInfo info = new FileInfo("My_Frequency.xlsx");
             using (ExcelPackage xlPackage = new ExcelPackage(info))
             {
-                ExcelWorksheet worksheet = xlPackage.Workbook.Worksheets[0];                
-                for (int iRow = 1; iRow <= 34; iRow++)
+                ExcelWorksheet worksheet = xlPackage.Workbook.Worksheets[0];
+                for (int iRow = 1; iRow <= 44; iRow++)
                 {
                     dict[Convert.ToChar(worksheet.GetValue(iRow, 1))] = Convert.ToDouble(worksheet.GetValue(iRow, 2));
-                }                
+                }
             }
             return dict;
+
+            ////Створення власного словника частотності
+            //int totalKeyCount = 0;
+            //Dictionary<char, double> cipheranalysis = new Dictionary<char, double>();
+            //double keycount;
+            //foreach (var c in BaseText)
+            //{
+            //    if (!cipheranalysis.TryGetValue(c, out keycount))
+            //        keycount = 0.0;
+            //    cipheranalysis[c] = keycount + 1;
+            //    totalKeyCount += 1;
+            //}
+            //Dictionary<char, double> FD = new Dictionary<char, double>();
+            //foreach (var pair in cipheranalysis)
+            //{
+            //    FD[pair.Key] = pair.Value / totalKeyCount;
+            //}
+            //FD['_'] = FD[' '];
+            //FD.Remove(' ');
+            //cipheranalysis = FD;
+
+            //// Dictionary<char, double> dict = new Dictionary<char, double>();
+            //ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            //FileInfo info = new FileInfo("My_Frequency.xlsx");
+            //using (ExcelPackage xlPackage = new ExcelPackage(info))
+            //{
+            //    ExcelWorksheet worksheet = xlPackage.Workbook.Worksheets[0];
+            //    int iRow = 1;
+            //    foreach (var pair in cipheranalysis)
+            //    {
+            //        worksheet.Cells[iRow, 1].Value = pair.Key.ToString();
+            //        worksheet.Cells[iRow, 2].Value = pair.Value.ToString();
+            //        iRow++;
+            //    }
+            //    xlPackage.Save();                
+            //}
+            //return cipheranalysis;
         }
 
         #region Функція Шифрування
         private void Encrypt()
         {
-            Dictionary<char, char> cipher = new Dictionary<char, char>();
             BaseText = BaseText.ToUpper();
-            foreach (var c in BaseText)
-            {
-                cipher[c] = '0';
-            }            
 
-            double d;
-            string CharsForRemoving = "";
-            foreach (var pair in cipher)
-            {
-                if (!StandardDict.TryGetValue(pair.Key, out d))
-                    CharsForRemoving += pair.Key;                    
-            }
-            foreach (var c in CharsForRemoving)
-            {
-                cipher.Remove(c);
-            }
-            cipher = cipher.OrderBy(pair => pair.Key).ToDictionary(pair => pair.Key, pair => pair.Value);
+            //Dictionary<char, double> standardFrequency = new Dictionary<char, double>();
+            //standardFrequency = GetEtalonDict();
+            //standardFrequency[' '] = standardFrequency['_'];
+            //standardFrequency.Remove('_');
+            //StandardDict = standardFrequency;
 
+            IEnumerable<char> textChars = BaseText.Distinct();            
+
+            Dictionary<char, char> cipher = new Dictionary<char, char>();            
+            
             Dictionary<char, int> cipherRandomizer = new Dictionary<char, int>();
             Random rnd = new Random();
             foreach (var pair in StandardDict)
@@ -127,22 +178,16 @@ namespace FrequencyEncryption.ViewModels
             }
             cipherRandomizer = cipherRandomizer.OrderBy(pair => pair.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
 
-            for (int i = 0; i < cipher.Count; i++)
+            for (int i = 0; i < StandardDict.Count; i++)
             {
-                cipher[cipher.ElementAt(i).Key] = cipherRandomizer.ElementAt(i).Key;               
+                cipher[StandardDict.ElementAt(i).Key] = cipherRandomizer.ElementAt(i).Key;               
             }
 
-            TestdDict = cipher;
-
-            char litera;
-            EncryptedText = "";
-            foreach (var c in BaseText)
-            {
-                if (!cipher.TryGetValue(c, out litera))
-                    litera = c;
-                EncryptedText += litera;
-            }
-
+            cipher = cipher.OrderByDescending(pair => pair.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
+            CipherDict = cipher;             
+                       
+            IEnumerable<char> strCharCode = BaseText.Select(c => (cipher.ContainsKey(c) ? cipher[c] : c));                             
+            EncryptedText = new string(strCharCode.ToArray());                
         }
         #endregion
 
@@ -150,7 +195,65 @@ namespace FrequencyEncryption.ViewModels
         private void Decipher()
         {
 
-            return;
+            //підраховуємо кількість появ у зашифрованому тексті кожної літери
+            Dictionary<char, int> cipheranalysis = new Dictionary<char, int>();
+            int keycount;
+            foreach (var c in EncryptedText)
+            {
+                if (!cipheranalysis.TryGetValue(c, out keycount))
+                    keycount = 0;
+                cipheranalysis[c] = keycount + 1;
+            }
+
+            //Видалення зі словника символів, що було вирішено не використовувати у шифруванні (як розділові знаки)
+            double d;
+            string CharsForRemoving = "";
+            foreach (var pair in cipheranalysis)
+            {
+                if (!StandardDict.TryGetValue(pair.Key, out d))
+                    CharsForRemoving += pair.Key;
+            }
+            foreach (var c in CharsForRemoving)
+            {
+                cipheranalysis.Remove(c);
+            }
+
+            //Сортування словників за частотою появ символів у зашифрованому тексті
+            // і еталоні, а також побудова ключового словника
+            cipheranalysis = cipheranalysis.OrderByDescending(pair => pair.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
+            StandardDict = StandardDict.OrderByDescending(pair => pair.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
+            Dictionary<char, char> keyDict = new Dictionary<char, char>();
+            for (int i = 0; i < cipheranalysis.Count; i++)
+            {
+                keyDict[cipheranalysis.ElementAt(i).Key] = StandardDict.ElementAt(i).Key;
+            }            
+
+            //Розшифровка тексту
+            IEnumerable<char> strCharCode = EncryptedText.Select(c => (keyDict.ContainsKey(c) ? keyDict[c] : c));
+            DecipheredText = new string(strCharCode.ToArray());
+
+            Dictionary<char, char> TD = new Dictionary<char, char>();
+            foreach (var pair in CipherDict)
+            {   
+                if (keyDict.ContainsKey(pair.Value))
+                    TD[pair.Key] = keyDict[pair.Value];
+                //TD[pair.Key] = (keyDict.ContainsKey(pair.Value) ? keyDict[pair.Value] : '0');
+            }
+            TD = TD.OrderByDescending(pair => pair.Key).ToDictionary(pair => pair.Key, pair => pair.Value);
+            DeCipherDict = TD;
+
+            int accordance = 0;
+            foreach (var pair in TD)
+            {
+                if (pair.Key ==pair.Value)
+                    accordance++;
+            }
+            double correctness = (double)accordance / TD.Count;
+            Title = correctness.ToString();
+
+
+            //keyDict = keyDict.OrderByDescending(pair => pair.Key).ToDictionary(pair => pair.Key, pair => pair.Value);
+            //DeCipherDict = keyDict;
         }
         #endregion
 
@@ -160,7 +263,7 @@ namespace FrequencyEncryption.ViewModels
         private void OnEncryptCommandExecuted(object p)
         {
             Encrypt();
-            ActiveTab = 1;
+            //ActiveTab = 1;
             return;
         }
         #endregion
@@ -170,6 +273,7 @@ namespace FrequencyEncryption.ViewModels
         private bool CanDecipherCommandExecute(object p) => true;
         private void OnDecipherCommandExecuted(object p)
         {
+            Decipher();
             return;
         }
         #endregion
@@ -179,7 +283,7 @@ namespace FrequencyEncryption.ViewModels
         public MainWindowViewModel()
         {
             Dictionary<char, double> standardFrequency = new Dictionary<char, double>();
-            standardFrequency = GetEtalonDict();            
+            standardFrequency = GetEtalonDict();
             standardFrequency[' '] = standardFrequency['_'];
             standardFrequency.Remove('_');
             StandardDict = standardFrequency;
