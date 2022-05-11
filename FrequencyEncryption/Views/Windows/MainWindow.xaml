@@ -16,20 +16,79 @@
             <ColumnDefinition Width="125"/>
             <ColumnDefinition Width="300"/>            
         </Grid.ColumnDefinitions>
-        <TabControl Grid.Column="0" SelectedIndex="{Binding ActiveTab}">
-            <TabItem Header="Вихідний текст">
-                <TextBox Text="{Binding BaseText}"
-                         TextWrapping="Wrap"
-                         VerticalScrollBarVisibility="Visible"
-                         AcceptsReturn="True"/>
-                
+        <TabControl Grid.Column="0" SelectedIndex="{Binding ActiveTab}">            
+            <TabItem Header="Вихіднийі дані">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" HorizontalAlignment="Right" Orientation="Horizontal">
+                            <TextBlock Text="P="/>
+                            <TextBox Width="25"
+                                Text="{Binding P}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal">
+                            <TextBlock Text="Q="/>
+                            <TextBox Width="25" 
+                                Text="{Binding Q}"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" HorizontalAlignment="Right" Orientation="Horizontal">
+                            <TextBlock Text="N="/>
+                            <TextBox Width="25" IsEnabled="False"
+                                Text="{Binding N}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal">
+                            <TextBlock Text="Fi="/>
+                            <TextBox Width="25" IsEnabled="False"
+                                Text="{Binding Fi}"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" HorizontalAlignment="Right" Orientation="Horizontal">
+                            <TextBlock Text="OpenKey="/>
+                            <TextBox Width="25" IsEnabled="False"
+                                Text="{Binding OpenKey}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal">
+                            <TextBlock Text="SecretKey="/>
+                            <TextBox Width="25" IsEnabled="False"
+                                Text="{Binding SecretKey}"/>
+                        </StackPanel>
+                    </Grid>
+                    <TextBox Grid.Row="3" Text="{Binding BaseText}"
+                             TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Visible"
+                             AcceptsReturn="True"/>
+                </Grid>                       
             </TabItem>
-            <TabItem Header="Зашифрований текст">
+            <!--<TabItem Header="Зашифрований текст">
                 <TextBox Text="{Binding EncryptedText}"
                          TextWrapping="Wrap"
                          VerticalScrollBarVisibility="Visible"
                          AcceptsReturn="True"/>
-            </TabItem>    
+            </TabItem>-->    
             <TabItem Header="Test">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -49,13 +108,32 @@
         </StackPanel>
 
         <GroupBox Grid.Column="2">
-            <StackPanel Orientation="Vertical" >            
-                <TextBlock Text="Результат розшифрування:" HorizontalAlignment="Center" Margin="5"/>
-                <TextBox Text="{Binding DecipheredText}" Margin="5 0 5 5" Height="380"
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <GroupBox Grid.Row="0" Header="Зашифроване повідомлення">
+                    <TextBox Text="{Binding EncryptedText}" Margin="5 0 5 5" Height="380"
+                         TextWrapping="Wrap"
+                         VerticalScrollBarVisibility="Visible"
+                         AcceptsReturn="True"/>
+                </GroupBox>
+                <GroupBox Grid.Row="1" Header="Розшифроване повідомлення">
+                    <TextBox Text="{Binding DecipheredText}" Margin="5 0 5 5" Height="380"
+                         TextWrapping="Wrap"
+                         VerticalScrollBarVisibility="Visible"
+                         AcceptsReturn="True"/>
+                </GroupBox>
+            </Grid>
+                
+                <!--<StackPanel Orientation="Vertical" >-->            
+                <!--<TextBlock Text="Результат розшифрування:" HorizontalAlignment="Center" Margin="5"/>-->
+                <!--<TextBox Text="{Binding DecipheredText}" Margin="5 0 5 5" Height="380"
                          TextWrapping="Wrap"
                          VerticalScrollBarVisibility="Visible"
                          AcceptsReturn="True"/>                       
-            </StackPanel>
+            </StackPanel>-->
         </GroupBox>
     </Grid>
 </Window>

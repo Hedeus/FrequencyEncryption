@@ -14,7 +14,7 @@ namespace FrequencyEncryption.ViewModels
 
         /*------------------------------------------------------------------------------------*/
 
-        #region Title : Title - початковий текст
+        #region Title : Title - Заголовок вікна
         private string _Title = "Точність розшифровки";
 
         public string Title
@@ -23,6 +23,66 @@ namespace FrequencyEncryption.ViewModels
             set => Set(ref _Title, value);
         }
 
+        #endregion
+
+        #region P : P - Перше число для розрахунку ключа
+        private int _P = 3;
+
+        public int P
+        {
+            get => _P;
+            set => Set(ref _P, value);
+        }
+        #endregion
+
+        #region Q : Q - Друге число для розрахунку ключа
+        private int _Q = 7;
+
+        public int Q
+        {
+            get => _Q;
+            set => Set(ref _Q, value);
+        }
+        #endregion
+
+        #region N : N - Модуль для розрахунку ключа
+        private int _N = 0;
+
+        public int N
+        {
+            get => _N;
+            set => Set(ref _N, value);
+        }
+        #endregion
+
+        #region Fi : Fi - Функція Ейлера
+        private int _Fi = 0;
+
+        public int Fi
+        {
+            get => _Fi;
+            set => Set(ref _Fi, value);
+        }
+        #endregion
+
+        #region OpenKey : OpenKey - Відкритий Ключ
+        private int _OpenKey = 0;
+
+        public int OpenKey
+        {
+            get => _OpenKey;
+            set => Set(ref _OpenKey, value);
+        }
+        #endregion
+
+        #region SecretKey : SecretKey - Закритий ключ
+        private int _SecretKey = 0;
+
+        public int SecretKey
+        {
+            get => _SecretKey;
+            set => Set(ref _SecretKey, value);
+        }
         #endregion
 
         #region ActiveTab : ActiveTab - номер вкладки
@@ -69,9 +129,9 @@ namespace FrequencyEncryption.ViewModels
         #endregion
 
         #region StandardDict : StandardDict Еталонний розподіл літер
-        private Dictionary<char, double> _StandardDict;        
+        private Dictionary<char, int> _StandardDict;        
 
-        public Dictionary<char, double> StandardDict       
+        public Dictionary<char, int> StandardDict       
         {
             get => _StandardDict;
             set => Set(ref _StandardDict, value);
@@ -100,6 +160,7 @@ namespace FrequencyEncryption.ViewModels
 
         /*------------------------------------------------------------------------------------*/
 
+        #region GetEtalonDict Отримання частотного розподілення літер 
         //Отримання частотного розподілення літер
         private Dictionary<char, double> GetEtalonDict()
         {
@@ -111,7 +172,7 @@ namespace FrequencyEncryption.ViewModels
             using (ExcelPackage xlPackage = new ExcelPackage(info))
             {
                 ExcelWorksheet worksheet = xlPackage.Workbook.Worksheets[0];
-                for (int iRow = 1; iRow <= 44; iRow++)
+                for (int iRow = 1; iRow <= 34; iRow++)
                 {
                     dict[Convert.ToChar(worksheet.GetValue(iRow, 1))] = Convert.ToDouble(worksheet.GetValue(iRow, 2));
                 }
@@ -154,6 +215,36 @@ namespace FrequencyEncryption.ViewModels
             //    xlPackage.Save();                
             //}
             //return cipheranalysis;
+        }
+        #endregion
+
+        #region GetRSADict Отримання RSA словника
+        private Dictionary<char, int> GetRSADict()
+        {
+            Dictionary<char, int> dict = new Dictionary<char, int>();
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            //FileInfo info = new FileInfo("Частотность.xlsx");
+            //FileInfo info = new FileInfo("My_Frequency.xlsx");
+            FileInfo info = new FileInfo("..\\..\\Data\\RSA_Dictionary.xlsx");
+            using (ExcelPackage xlPackage = new ExcelPackage(info))
+            {
+                ExcelWorksheet worksheet = xlPackage.Workbook.Worksheets[0];
+                for (int iRow = 1; iRow <= 34; iRow++)
+                {
+                    dict[Convert.ToChar(worksheet.GetValue(iRow, 1))] = Convert.ToInt32(worksheet.GetValue(iRow, 2));
+                }
+            }
+            return dict;
+        } 
+        #endregion
+
+        private void RSAEncrypt()
+        {
+            BaseText = BaseText.ToUpper();
+            IEnumerable<char> textChars = BaseText.Distinct();
+
+
+
         }
 
         #region Функція Шифрування
@@ -207,7 +298,7 @@ namespace FrequencyEncryption.ViewModels
             }
 
             //Видалення зі словника символів, що було вирішено не використовувати у шифруванні (як розділові знаки)
-            double d;
+            int d;
             string CharsForRemoving = "";
             foreach (var pair in cipheranalysis)
             {
@@ -263,7 +354,7 @@ namespace FrequencyEncryption.ViewModels
         private bool CanEncryptCommandExecute(object p) => true;
         private void OnEncryptCommandExecuted(object p)
         {
-            Encrypt();
+            //Encrypt();
             //ActiveTab = 1;
             return;
         }
@@ -274,7 +365,7 @@ namespace FrequencyEncryption.ViewModels
         private bool CanDecipherCommandExecute(object p) => true;
         private void OnDecipherCommandExecuted(object p)
         {
-            Decipher();
+            //Decipher();
             return;
         }
         #endregion
@@ -283,8 +374,9 @@ namespace FrequencyEncryption.ViewModels
 
         public MainWindowViewModel()
         {
-            Dictionary<char, double> standardFrequency = new Dictionary<char, double>();
-            standardFrequency = GetEtalonDict();
+            Dictionary<char, int> standardFrequency = new Dictionary<char, int>();
+            //standardFrequency = GetEtalonDict();
+            standardFrequency = GetRSADict();
             standardFrequency[' '] = standardFrequency['_'];
             standardFrequency.Remove('_');
             StandardDict = standardFrequency;
