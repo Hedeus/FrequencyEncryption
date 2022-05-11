@@ -106,7 +106,8 @@ namespace FrequencyEncryption.ViewModels
             Dictionary<char, double> dict = new Dictionary<char, double>();
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             //FileInfo info = new FileInfo("Частотность.xlsx");
-            FileInfo info = new FileInfo("My_Frequency.xlsx");
+            //FileInfo info = new FileInfo("My_Frequency.xlsx");
+            FileInfo info = new FileInfo("..\\..\\Data\\My_Frequency.xlsx");
             using (ExcelPackage xlPackage = new ExcelPackage(info))
             {
                 ExcelWorksheet worksheet = xlPackage.Workbook.Worksheets[0];
