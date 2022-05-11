@@ -85,6 +85,18 @@ namespace FrequencyEncryption.ViewModels
         }
         #endregion
 
+        #region PrimeList : PrimeList - Список простих чисел
+        private List<int> _PrimeList;
+
+        public List<int> PrimeList
+        {
+            get => _PrimeList;
+            set => Set(ref _PrimeList, value);
+        }
+        #endregion
+
+
+
         #region ActiveTab : ActiveTab - номер вкладки
         private int _ActiveTab = 0;
 
@@ -235,6 +247,40 @@ namespace FrequencyEncryption.ViewModels
                 }
             }
             return dict;
+        }
+        #endregion
+
+        #region CreatePrimeList - Створення списка простих чисел
+        private List<int> CreatePrimeList()
+        {
+            int max = 300;
+            List<int> Primes = new List<int>();
+            Primes.Add(2);
+            //for (int i = 3; i < int.MaxValue; i += 2)
+            for (int i = 3; i < max; i += 2)
+            {
+                if ((i > 10) && (i % 10 == 5))
+                {
+                    continue;
+                }
+                for (int j = 0; j < Primes.Count; j++)
+                {
+                    if (j * j - 1 > i)
+                    {
+                        Primes.Add(i);
+                        break;
+                    }
+                    if (i % j == 0)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        Primes.Add(i);
+                    }
+                }
+            }
+            return Primes;
         } 
         #endregion
 
@@ -243,7 +289,8 @@ namespace FrequencyEncryption.ViewModels
             BaseText = BaseText.ToUpper();
             IEnumerable<char> textChars = BaseText.Distinct();
 
-
+            N = P * Q;
+            Fi = (P - 1) * (Q - 1);
 
         }
 
@@ -380,6 +427,9 @@ namespace FrequencyEncryption.ViewModels
             standardFrequency[' '] = standardFrequency['_'];
             standardFrequency.Remove('_');
             StandardDict = standardFrequency;
+            List<int> listofprimes = new List<int>();
+            listofprimes = CreatePrimeList();
+            PrimeList = listofprimes;
 
             EncryptCommand = new LambdaCommand(OnEncryptCommandExecuted, CanEncryptCommandExecute);
             DecipherCommand = new LambdaCommand(OnDecipherCommandExecuted, CanDecipherCommandExecute);
