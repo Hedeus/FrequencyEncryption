@@ -121,13 +121,13 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <GroupBox Grid.Row="0" Header="Зашифроване повідомлення">
-                    <TextBox Text="{Binding EncryptedText}" Margin="5 0 5 5" Height="380"
+                    <TextBox Text="{Binding EncryptedText}" Margin="5 0 5 5"
                          TextWrapping="Wrap"
                          VerticalScrollBarVisibility="Visible"
                          AcceptsReturn="True"/>
                 </GroupBox>
                 <GroupBox Grid.Row="1" Header="Розшифроване повідомлення">
-                    <TextBox Text="{Binding DecipheredText}" Margin="5 0 5 5" Height="380"
+                    <TextBox Text="{Binding DecipheredText}" Margin="5 0 5 5"
                          TextWrapping="Wrap"
                          VerticalScrollBarVisibility="Visible"
                          AcceptsReturn="True"/>

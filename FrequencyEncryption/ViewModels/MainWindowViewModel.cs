@@ -129,6 +129,17 @@ namespace FrequencyEncryption.ViewModels
 
         #endregion
 
+        #region EncryptedMessage : EncryptedMessage - зашифрованe повідомлення
+        private IEnumerable<int> _EncryptedMessage;
+
+        public IEnumerable<int> EncryptedMessage
+        {
+            get => _EncryptedMessage;
+            set => Set(ref _EncryptedMessage, value);
+        }
+
+        #endregion
+
         #region DecipheredText : DecipheredText - розшифрований текст
         private string _DecipheredText = "Тут буде розшифрований текст";
 
@@ -157,6 +168,16 @@ namespace FrequencyEncryption.ViewModels
         {
             get => _CipherDict;
             set => Set(ref _CipherDict, value);
+        }
+        #endregion
+
+        #region RSADict : RSADict        
+        private Dictionary<char, int> _RSADict;
+
+        public Dictionary<char, int> RSADict
+        {
+            get => _RSADict;
+            set => Set(ref _RSADict, value);
         }
         #endregion
 
@@ -253,7 +274,7 @@ namespace FrequencyEncryption.ViewModels
         #region CreatePrimeList - Створення списка простих чисел
         private List<int> CreatePrimeList()
         {
-            int max = 1000;
+            int max = 100;
             List<int> Primes = new List<int>();
             Primes.Add(2);
             Primes.Add(3);
@@ -327,37 +348,114 @@ namespace FrequencyEncryption.ViewModels
         {
             (int g, int x, int y) = gcdex(a, m);
             return g > 1 ? 0 : (x % m + m) % m;
-        } 
+        }
         #endregion
 
+        #region powmod - Зведення у ступінь по модулю
+        private int powmod(int a, int n, int m)
+        {
+            int x = a;
+            while (n > 1)
+            {
+                x = (x * a) % m;
+                n--;
+            }
+            return x;
+        }
+        #endregion
+
+        #region RSAEncrypt - Шифрування за RSA
         private void RSAEncrypt()
         {
-            BaseText = BaseText.ToUpper();
-            IEnumerable<char> textChars = BaseText.Distinct();
-
             Random rnd = new Random();
-            P = PrimeList[rnd.Next(0, PrimeList.Count)];
-            Q = PrimeList[rnd.Next(0, PrimeList.Count)];
-            N = P * Q;
-            Fi = (P - 1) * (Q - 1);
-                        
-            int x = Fi;
-            while (!PrimeList.Contains(x))
-            {
-                x--;
-            }
-            int e;
-            e = PrimeList[rnd.Next(0, PrimeList.IndexOf(x))];
 
-            while (!IsCoprime(e, Fi))
+            int e = PrimeList[rnd.Next(0, PrimeList.Count)];
+            int d = PrimeList[rnd.Next(0, PrimeList.Count)];
+            int n = e * d;
+            int f = (e - 1) * (d - 1);
+            while (f < 100 || e == d)
+            {
+                e = PrimeList[rnd.Next(0, PrimeList.Count)];
+                d = PrimeList[rnd.Next(0, PrimeList.Count)];
+                n = e * d;
+                f = (e - 1) * (d - 1);
+            }
+            P = e;
+            Q = d;
+            N = n;
+            Fi = f;
+
+            int x = Fi;
+            if (x > PrimeList[PrimeList.Count - 1])
+            {
+                x = PrimeList[PrimeList.Count - 1];
+            }
+            else
+            {
+                while (!PrimeList.Contains(x))
+                {
+                    x--;
+                }
+            }
+
+            e = PrimeList[rnd.Next(0, PrimeList.IndexOf(x))];
+            while (!IsCoprime(e, Fi) || e > Fi)
             {
                 e = e = PrimeList[rnd.Next(0, PrimeList.IndexOf(x))];
             }
             OpenKey = e;
-            int d;
+
             d = invmod(e, Fi);
             SecretKey = d;
+
+            //BaseText = BaseText.ToUpper();
+            IEnumerable<char> textChars = BaseText.Distinct();
+
+            Dictionary<char, int> cipher = new Dictionary<char, int>();
+            d = 1;
+            foreach (var c in textChars)
+            {
+                cipher[c] = d;
+                d++;
+            }
+            RSADict = cipher;
+
+            IEnumerable<int> crypto = BaseText.Select(c => powmod(RSADict[c], OpenKey, N));
+            EncryptedMessage = crypto;
+
+            string s = "";
+            foreach (var c in EncryptedMessage)
+            {
+                s += c.ToString() + ",";
+            }
+            EncryptedText = s;
         }
+        #endregion
+
+        #region RSADecipher - RSA розшифровування
+        private void RSADecipher()
+        {
+            Dictionary<int, char> decipherdict = new Dictionary<int, char>();
+            for (int i = 0; i < RSADict.Count; i++)
+            {
+                decipherdict[RSADict.ElementAt(i).Value] = RSADict.ElementAt(i).Key;
+            }
+
+            string s = "";
+            int e;
+            foreach (var i in EncryptedMessage)
+            {
+                e = powmod(i, SecretKey, N);
+                if (decipherdict.ContainsKey(e))
+                {
+                    s += decipherdict[e];
+                }
+                else
+                    s += "?";
+            }
+            DecipheredText = s;
+        } 
+        #endregion
 
         #region Функція Шифрування
         private void Encrypt()
@@ -391,7 +489,7 @@ namespace FrequencyEncryption.ViewModels
             CipherDict = cipher;             
                        
             IEnumerable<char> strCharCode = BaseText.Select(c => (cipher.ContainsKey(c) ? cipher[c] : c));                             
-            EncryptedText = new string(strCharCode.ToArray());                
+            EncryptedText = new string(strCharCode.ToArray());            
         }
         #endregion
 
@@ -468,17 +566,19 @@ namespace FrequencyEncryption.ViewModels
         {
             //Encrypt();
             RSAEncrypt();
+            //RSADecipher();
             //ActiveTab = 1;
             return;
         }
         #endregion
 
-        #region DecipherCommand : DecipherCommand - Команда зашифрувати
+        #region DecipherCommand : DecipherCommand - Команда розшифрувати
         public ICommand DecipherCommand { get; }
         private bool CanDecipherCommandExecute(object p) => true;
         private void OnDecipherCommandExecuted(object p)
         {
             //Decipher();
+            RSADecipher();
             return;
         }
         #endregion
@@ -487,12 +587,12 @@ namespace FrequencyEncryption.ViewModels
 
         public MainWindowViewModel()
         {
-            Dictionary<char, int> standardFrequency = new Dictionary<char, int>();
+            //Dictionary<char, int> standardFrequency = new Dictionary<char, int>();
             //standardFrequency = GetEtalonDict();
-            standardFrequency = GetRSADict();
-            standardFrequency[' '] = standardFrequency['_'];
-            standardFrequency.Remove('_');
-            StandardDict = standardFrequency;
+            //standardFrequency = GetRSADict();
+            //standardFrequency[' '] = standardFrequency['_'];
+            //standardFrequency.Remove('_');
+            //StandardDict = standardFrequency;
             List<int> listofprimes = new List<int>();
             listofprimes = CreatePrimeList();
             PrimeList = listofprimes;

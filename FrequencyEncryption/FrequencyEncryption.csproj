@@ -104,10 +104,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Resource Include="Data\My_Frequency.xlsx" />
+    <AdditionalFiles Include="Data\My_Frequency.xlsx" />
     <AdditionalFiles Include="Data\RSA_Dictionary.xlsx" />
     <None Include="Data\Частотность.xlsx" />
-    <Resource Include="Data\Ще будучи зеленим і вразливим юнаком.docx" />
+    <AdditionalFiles Include="Data\Ще будучи зеленим і вразливим юнаком.docx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
