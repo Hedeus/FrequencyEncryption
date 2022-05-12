@@ -28,17 +28,18 @@
                     <Grid Grid.Row="0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
+                            <ColumnDefinition/>                           
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0" HorizontalAlignment="Right" Orientation="Horizontal">
                             <TextBlock Text="P="/>
-                            <TextBox Width="25"
+                            <TextBox Width="75"
+                                     Margin="0 0 10 0"
                                 Text="{Binding P}"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal">
                             <TextBlock Text="Q="/>
-                            <TextBox Width="25" 
+                            <TextBox Width="75"
+                                      Margin="0 0 10 0"
                                 Text="{Binding Q}"/>
                         </StackPanel>
                     </Grid>
@@ -46,16 +47,19 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                             <ColumnDefinition/>
-                            <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0" HorizontalAlignment="Right" Orientation="Horizontal">
                             <TextBlock Text="N="/>
-                            <TextBox Width="25" IsEnabled="False"
+                            <TextBox Width="75"
+                                      Margin="0 0 10 0"
+                                     IsEnabled="False"
                                 Text="{Binding N}"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal">
                             <TextBlock Text="Fi="/>
-                            <TextBox Width="25" IsEnabled="False"
+                            <TextBox Width="75"
+                                      Margin="0 0 10 0"
+                                     IsEnabled="False"
                                 Text="{Binding Fi}"/>
                         </StackPanel>
                     </Grid>
@@ -64,16 +68,19 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                             <ColumnDefinition/>
-                            <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0" HorizontalAlignment="Right" Orientation="Horizontal">
                             <TextBlock Text="OpenKey="/>
-                            <TextBox Width="25" IsEnabled="False"
+                            <TextBox Width="75"
+                                     Margin="0 0 10 0"
+                                     IsEnabled="False"
                                 Text="{Binding OpenKey}"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal">
                             <TextBlock Text="SecretKey="/>
-                            <TextBox Width="25" IsEnabled="False"
+                            <TextBox Width="75"
+                                     Margin="0 0 10 0"
+                                     IsEnabled="False"
                                 Text="{Binding SecretKey}"/>
                         </StackPanel>
                     </Grid>

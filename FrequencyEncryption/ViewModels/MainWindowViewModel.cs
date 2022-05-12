@@ -253,31 +253,32 @@ namespace FrequencyEncryption.ViewModels
         #region CreatePrimeList - Створення списка простих чисел
         private List<int> CreatePrimeList()
         {
-            int max = 300;
+            int max = 1000;
             List<int> Primes = new List<int>();
             Primes.Add(2);
-            //for (int i = 3; i < int.MaxValue; i += 2)
-            for (int i = 3; i < max; i += 2)
+            Primes.Add(3);
+            //for (int i = 5; i < int.MaxValue; i += 2)
+            for (int i = 5; i < max; i += 2)
             {
                 if ((i > 10) && (i % 10 == 5))
                 {
                     continue;
                 }
-                for (int j = 0; j < Primes.Count; j++)
+                for (int j = 1; j < Primes.Count; j++)
                 {
-                    if (j * j - 1 > i)
+                    if (Primes[j] * Primes[j - 1] > i)
                     {
                         Primes.Add(i);
                         break;
                     }
-                    if (i % j == 0)
+                    if (i % Primes[j] == 0)
                     {
                         break;
                     }
-                    else
-                    {
-                        Primes.Add(i);
-                    }
+                    //else
+                    //{
+                    //    Primes.Add(i);
+                    //}
                 }
             }
             return Primes;
@@ -285,6 +286,24 @@ namespace FrequencyEncryption.ViewModels
         #endregion
 
         #region IsCoprime - Перевірка на взаємну простоту 2 чисел
+        //public static bool IsCoprime(int num1, int num2)
+        //{
+        //    if (num1 == num2)
+        //    {
+        //        return num1 == 1;
+        //    }
+        //    else
+        //    {
+        //        if (num1 > num2)
+        //        {
+        //            return IsCoprime(num1 - num2, num2);
+        //        }
+        //        else
+        //        {
+        //            return IsCoprime(num2 - num1, num1);
+        //        }
+        //    }
+        //}
         public static bool IsCoprime(int a, int b)
         {
             return a == b
@@ -292,6 +311,22 @@ namespace FrequencyEncryption.ViewModels
                 : a > b
                     ? IsCoprime(a - b, b)
                     : IsCoprime(b - a, a);
+        }
+        #endregion
+
+        #region invmod(int a, int m) - Пошук числа, зворотньго до заданного числа "а" за модулем "m"
+        private static (int, int, int) gcdex(int a, int b)
+        {
+            if (a == 0)
+                return (b, 0, 1);
+            (int gcd, int x, int y) = gcdex(b % a, a);
+            return (gcd, y - (b / a) * x, x);
+        }
+
+        private static int invmod(int a, int m)
+        {
+            (int g, int x, int y) = gcdex(a, m);
+            return g > 1 ? 0 : (x % m + m) % m;
         } 
         #endregion
 
@@ -300,18 +335,28 @@ namespace FrequencyEncryption.ViewModels
             BaseText = BaseText.ToUpper();
             IEnumerable<char> textChars = BaseText.Distinct();
 
+            Random rnd = new Random();
+            P = PrimeList[rnd.Next(0, PrimeList.Count)];
+            Q = PrimeList[rnd.Next(0, PrimeList.Count)];
             N = P * Q;
             Fi = (P - 1) * (Q - 1);
-            Random rnd = new Random();            
+                        
             int x = Fi;
             while (!PrimeList.Contains(x))
             {
                 x--;
             }
             int e;
+            e = PrimeList[rnd.Next(0, PrimeList.IndexOf(x))];
 
-            e = rnd.Next(0, PrimeList.IndexOf(x));
-
+            while (!IsCoprime(e, Fi))
+            {
+                e = e = PrimeList[rnd.Next(0, PrimeList.IndexOf(x))];
+            }
+            OpenKey = e;
+            int d;
+            d = invmod(e, Fi);
+            SecretKey = d;
         }
 
         #region Функція Шифрування
@@ -422,6 +467,7 @@ namespace FrequencyEncryption.ViewModels
         private void OnEncryptCommandExecuted(object p)
         {
             //Encrypt();
+            RSAEncrypt();
             //ActiveTab = 1;
             return;
         }
