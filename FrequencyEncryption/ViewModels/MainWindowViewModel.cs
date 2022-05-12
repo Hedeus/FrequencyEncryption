@@ -281,6 +281,17 @@ namespace FrequencyEncryption.ViewModels
                 }
             }
             return Primes;
+        }
+        #endregion
+
+        #region IsCoprime - Перевірка на взаємну простоту 2 чисел
+        public static bool IsCoprime(int a, int b)
+        {
+            return a == b
+                ? a == 1
+                : a > b
+                    ? IsCoprime(a - b, b)
+                    : IsCoprime(b - a, a);
         } 
         #endregion
 
@@ -291,6 +302,15 @@ namespace FrequencyEncryption.ViewModels
 
             N = P * Q;
             Fi = (P - 1) * (Q - 1);
+            Random rnd = new Random();            
+            int x = Fi;
+            while (!PrimeList.Contains(x))
+            {
+                x--;
+            }
+            int e;
+
+            e = rnd.Next(0, PrimeList.IndexOf(x));
 
         }
 
